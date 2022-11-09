@@ -4,7 +4,7 @@
         <Property name="LOG_PATTERN">%d %highlight{%-5level}{ERROR=Bright RED, WARN=Bright Yellow, INFO=Bright Green, DEBUG=Bright Cyan, TRACE=Bright White} %style{[%t]}{bright,magenta} %style{%c.%M(%L)}{cyan}: %msg%n
         </Property>
         <!-- 配置日志文件输出目录，此配置将日志输出到指定文件夹 -->
-        <Property name="LOG_HOME">src/main/resources/logs</Property>
+        <Property name="LOG_HOME">logs</Property>
     </Properties>
     <Appenders>
         <!-- 输出控制台日志的配置 -->
