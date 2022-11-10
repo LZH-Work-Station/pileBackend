@@ -1,6 +1,6 @@
 package com.pile.backend.config;
 
-import com.pile.backend.common.Exception.PileException;
+import com.pile.backend.common.exception.PileException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

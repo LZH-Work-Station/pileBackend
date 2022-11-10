@@ -1,4 +1,4 @@
-package com.pile.backend.common.Exception;
+package com.pile.backend.common.exception;
 
 
 import com.pile.backend.common.result.ResultCodeEnum;
