@@ -4,3 +4,10 @@ server:
 logging:
   config:
     classpath: log4j2.xml
+
+spring:
+  datasource:
+    username: root
+    password: 990722
+    url: jdbc:mysql://120.26.198.0:3306/greenmind?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver

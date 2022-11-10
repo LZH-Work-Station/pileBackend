@@ -1,11 +1,12 @@
 package com.pile.backend.service;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import com.pile.backend.common.util.DateTimeUtil;
 import com.pile.backend.common.util.RestfulRequestUtil;
-import com.pile.backend.pojo.dto.Journey;
+import com.pile.backend.pojo.bo.JourneyBO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
+import com.pile.backend.pojo.po.mapper.GareMapper;
+import com.pile.backend.pojo.vo.JourneyListVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,10 @@ public class JourneyService {
     @Autowired
     DateTimeUtil dateTimeUtil;
 
-    public List<Journey> getJourneyInfo(JourneyRequestDTO journeyRequestDTO) {
+    @Autowired
+    private GareMapper gareMapper;
+
+    public JourneyListVO getJourneyInfo(JourneyRequestDTO journeyRequestDTO) {
         // source: 75056, destination: 69123
         // 获取请求的url，判断是否为当天
         String now = dateTimeUtil.getTimeInFrance();    // 获得sncf API所需格式的当前时间
@@ -36,7 +40,7 @@ public class JourneyService {
 
         // 如果请求时间是过去就获取不到之前日期的数据
         if(dateTimeUtil.compare(requestDate, dateTimeUtil.getToday(), "yyyyMMdd", "yyyyMMdd")<0){
-            return new ArrayList<>();
+            return new JourneyListVO();
         }
 
         // =-1代表没有定义时间
@@ -65,26 +69,28 @@ public class JourneyService {
         return buildListJourney(thisUrl, requestDate, journeyRequestDTO);
     }
 
-    public List<Journey> buildListJourney(String url, String date, JourneyRequestDTO journeyRequestDTO){
-        List<Journey> list = new ArrayList<>();
+    public JourneyListVO buildListJourney(String url, String date, JourneyRequestDTO journeyRequestDTO){
+        List<JourneyBO> list = new ArrayList<>();
         requestJourney(url, date, journeyRequestDTO, list);
-        return list;
+        JourneyListVO journeyListVO = new JourneyListVO();
+        journeyListVO.setJourneyListVO(list);
+        return journeyListVO;
     }
 
-    public void requestJourney(String url, String date, JourneyRequestDTO journeyRequestDTO, List<Journey> list){
+    public void requestJourney(String url, String date, JourneyRequestDTO journeyRequestDTO, List<JourneyBO> list){
         JSONObject journeysInfo = restfulRequestUtil.doGet(url, token);
         JSONObject journeysInJson = journeysInfo.getJSONArray("journeys").getJSONObject(0);
 
         if(dateTimeUtil.compare(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("departure_date_time")), date, "yyyy-MM-dd HH:mm:ss", "yyyyMMdd")>0){
             // 创建Journey对象用来返回给前端
-            Journey journey = new Journey();
-            journey.setSource(journeyRequestDTO.getSource());
-            journey.setDestination(journeyRequestDTO.getDestination());
-            journey.setArrivalTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("arrival_date_time")));
-            journey.setDepartureTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("departure_date_time")));
-            journey.setCo2Emission(journeysInJson.getJSONObject("co2_emission").getDouble("value"));
-            journey.setDuration(journeysInJson.getInt("duration") / 60);
-            list.add(journey);
+            JourneyBO journeyBO = new JourneyBO();
+            journeyBO.setSource(journeyRequestDTO.getSource());
+            journeyBO.setDestination(journeyRequestDTO.getDestination());
+            journeyBO.setArrivalTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("arrival_date_time")));
+            journeyBO.setDepartureTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("departure_date_time")));
+            journeyBO.setCo2Emission(journeysInJson.getJSONObject("co2_emission").getDouble("value"));
+            journeyBO.setDuration(journeysInJson.getInt("duration") / 60);
+            list.add(journeyBO);
         }
 
         // 获得下一个请求的url

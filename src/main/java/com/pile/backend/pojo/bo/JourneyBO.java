@@ -1,4 +1,4 @@
-package com.pile.backend.pojo.dto;
+package com.pile.backend.pojo.bo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class Journey {
+public class JourneyBO {
     @ApiModelProperty(value = "出发地点")
     private String source;
 

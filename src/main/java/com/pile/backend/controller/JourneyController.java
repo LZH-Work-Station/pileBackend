@@ -1,7 +1,8 @@
 package com.pile.backend.controller;
 import com.pile.backend.common.result.Result;
-import com.pile.backend.pojo.dto.Journey;
+import com.pile.backend.pojo.bo.JourneyBO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
+import com.pile.backend.pojo.vo.JourneyListVO;
 import com.pile.backend.service.JourneyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -26,8 +27,8 @@ public class JourneyController {
     public Result getJourneyInfo(@RequestBody JourneyRequestDTO journeyRequestDTO){
         try{
             logger.info("Request the JourneyInfo : " + journeyRequestDTO.toString());
-            List<Journey> list = journeyService.getJourneyInfo(journeyRequestDTO);
-            return Result.ok(list);
+            JourneyListVO journeyListVO = journeyService.getJourneyInfo(journeyRequestDTO);
+            return Result.ok(journeyListVO);
         }catch (Exception e){
             logger.error(e.getMessage());
             return Result.fail(e.getMessage());
