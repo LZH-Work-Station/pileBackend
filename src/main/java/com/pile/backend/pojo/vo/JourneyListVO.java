@@ -7,6 +7,5 @@ import java.util.List;
 
 @Data
 public class JourneyListVO {
-
-    private List<JourneyBO> journeyListVO;
+    private List<JourneyBO> journeyVOList;
 }

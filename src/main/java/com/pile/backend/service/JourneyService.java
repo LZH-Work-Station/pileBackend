@@ -1,11 +1,15 @@
 package com.pile.backend.service;
 
 import cn.hutool.json.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pile.backend.common.util.DateTimeUtil;
 import com.pile.backend.common.util.RestfulRequestUtil;
 import com.pile.backend.pojo.bo.JourneyBO;
+import com.pile.backend.pojo.dto.GareRequestDTO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
+import com.pile.backend.pojo.po.Gare;
 import com.pile.backend.pojo.po.mapper.GareMapper;
+import com.pile.backend.pojo.vo.GareListVo;
 import com.pile.backend.pojo.vo.JourneyListVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +22,7 @@ import java.util.List;
 @Service
 public class JourneyService {
     private static final Logger logger = LogManager.getLogger(JourneyService.class);
-    private static final String url = "https://api.sncf.com/v1/coverage/sncf/journeys?from={source}&to={destination}&datetime={time}";
+    private static final String url = "https://api.sncf.com/v1/coverage/sncf/journeys?from=stop_area:SNCF:{source}&to=stop_area:SNCF:{destination}&datetime={time}";
     private static final String token = "3defecd3-7c95-487c-83de-1343cd951a20";
 
     @Autowired
@@ -43,16 +47,21 @@ public class JourneyService {
             return new JourneyListVO();
         }
 
+        // 查询数据库构造url
+        String sourceCode = getGareCode(journeyRequestDTO.getSource());
+        String destinationCode = getGareCode(journeyRequestDTO.getDestination());
+
+
         // =-1代表没有定义时间
         if(requestHour==-1){
             if(now.substring(0, 8).equals(requestDate)){
                 // 获取当前时间，因为出发日期是今天，所以从当前时间开始计算
-                thisUrl = url.replace("{source}", journeyRequestDTO.getSource())
-                        .replace("{destination}", journeyRequestDTO.getDestination()).replace("{time}", now);
+                thisUrl = url.replace("{source}", sourceCode)
+                        .replace("{destination}", destinationCode).replace("{time}", now);
             }else{
                 // 获取指定日期的0点开始
-                thisUrl = url.replace("{source}", journeyRequestDTO.getSource())
-                        .replace("{destination}", journeyRequestDTO.getDestination()).replace("{time}", requestDate+"T000000");
+                thisUrl = url.replace("{source}", sourceCode)
+                        .replace("{destination}", destinationCode).replace("{time}", requestDate+"T000000");
             }
         }else{  // 定义了时间 直接按照定义的走
             String hour = "";
@@ -61,8 +70,8 @@ public class JourneyService {
             }else{
                 hour = String.valueOf(requestHour);
             }
-            thisUrl = url.replace("{source}", journeyRequestDTO.getSource())
-                    .replace("{destination}", journeyRequestDTO.getDestination()).replace("{time}", requestDate+"T"+hour+"0000");
+            thisUrl = url.replace("{source}", sourceCode)
+                    .replace("{destination}", destinationCode).replace("{time}", requestDate+"T"+hour+"0000");
         }
 
         logger.info("Request sncf api on " + requestDate + " with url " + thisUrl);
@@ -73,8 +82,21 @@ public class JourneyService {
         List<JourneyBO> list = new ArrayList<>();
         requestJourney(url, date, journeyRequestDTO, list);
         JourneyListVO journeyListVO = new JourneyListVO();
-        journeyListVO.setJourneyListVO(list);
+        journeyListVO.setJourneyVOList(list);
         return journeyListVO;
+    }
+
+    public String getGareCode(String gareName){
+        QueryWrapper<Gare> sourceQueryWrapper = new QueryWrapper<>();
+        sourceQueryWrapper.eq("libelle", gareName);
+        sourceQueryWrapper.last("limit 1");
+        List<Gare> gares = gareMapper.selectList(sourceQueryWrapper);
+        if(gares.size()!=1){
+            logger.error("No code of gare correspendance");
+            return "";
+        }else{
+            return gares.get(0).getCodeUic();
+        }
     }
 
     public void requestJourney(String url, String date, JourneyRequestDTO journeyRequestDTO, List<JourneyBO> list){
@@ -101,4 +123,20 @@ public class JourneyService {
             requestJourney(nextUrl, date, journeyRequestDTO, list);
         }
     }
+
+    // 查询城市的火车站信息
+    public GareListVo getGareInfo(GareRequestDTO gareRequestDTO) {
+        QueryWrapper<Gare> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("commune", gareRequestDTO.getCity().toUpperCase());
+        queryWrapper.select("DISTINCT libelle");
+        List<Gare> gareList = gareMapper.selectList(queryWrapper);
+        GareListVo gareListVo = new GareListVo();
+        List<String> namesOfGare = new ArrayList<>();
+        for(Gare gare: gareList){
+            namesOfGare.add(gare.getLibelle());
+        }
+        gareListVo.setGareList(namesOfGare);
+        return gareListVo;
+    }
+
 }
