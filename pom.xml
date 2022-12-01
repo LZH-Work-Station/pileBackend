@@ -25,6 +25,7 @@
         <aliyun.version>4.1.1</aliyun.version>
         <oss.version>3.9.1</oss.version>
         <jodatime.version>2.10.1</jodatime.version>
+        <skipTests>true</skipTests>
     </properties>
     <!--添加spring-boot-starter-parent作为父级依赖-->
      <parent>
@@ -113,6 +114,7 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.30</version>
         </dependency>
+
     </dependencies>
 
     <build>

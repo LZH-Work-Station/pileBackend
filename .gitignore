@@ -2,3 +2,4 @@
 /logs
 .idea
 /src/main/resources/donneeInDatabase
+/src/test
