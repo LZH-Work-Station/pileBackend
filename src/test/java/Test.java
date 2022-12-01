@@ -1,6 +1,8 @@
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.pile.backend.PileApplication;
+import com.pile.backend.common.util.RestfulRequestUtil;
 import com.pile.backend.pojo.po.CarCo2;
 import com.pile.backend.pojo.po.Gare;
 import com.pile.backend.pojo.po.mapper.CarCo2Mapper;
@@ -38,6 +40,9 @@ public class Test {
     @Autowired
     private CarCo2Mapper carCo2Mapper;
 
+    @Autowired
+    RestfulRequestUtil restfulRequestUtil;
+
 
     @org.junit.Test
     public void test1() throws ClassNotFoundException {
@@ -53,6 +58,19 @@ public class Test {
         System.out.println(jsonObject.getJSONArray("journeys").getJSONObject(0).getJSONObject("co2_emission").getDouble("value"));
         System.out.println(jsonObject.getJSONArray("journeys").getJSONObject(0).getStr("duration"));
         System.out.println(jsonObject.getJSONArray("journeys").getJSONObject(0).getJSONArray("links").getJSONObject(0).getStr("href"));
+    }
+
+    @org.junit.Test
+    public void testCo2Request(){
+        String url = "https://api.distancematrix.ai/maps/api/distancematrix/json?origins=20 avenue albert einstein &destinations=part dieu&key=jiYcrAIIvKENNhfDJLx8FAfyTWwX8";
+        JSONObject distanceInfo = restfulRequestUtil.doGet(url);
+        JSONObject rows = (JSONObject) distanceInfo.getJSONArray("rows").get(0);
+        System.out.println(rows);
+        JSONObject elements = (JSONObject) rows.getJSONArray("elements").get(0);
+        System.out.println(elements);
+        Long distance = elements.getJSONObject("distance").getLong("value");
+        System.out.println(distance);
+
     }
 
 

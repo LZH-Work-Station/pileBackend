@@ -24,4 +24,10 @@ public class RestfulRequestUtil {
         ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), String.class);
         return JSONUtil.parseObj(result.getBody());
     }
+
+    // 不需要token的请求
+    public JSONObject doGet(String url){
+        ResponseEntity<String> result = restTemplate.getForEntity(url, String.class);
+        return JSONUtil.parseObj(result.getBody());
+    }
 }
