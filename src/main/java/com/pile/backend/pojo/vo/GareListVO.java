@@ -5,6 +5,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GareListVo {
+public class GareListVO {
     private List<String> gareList;
 }

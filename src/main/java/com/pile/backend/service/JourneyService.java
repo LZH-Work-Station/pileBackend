@@ -9,7 +9,7 @@ import com.pile.backend.pojo.dto.GareRequestDTO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
 import com.pile.backend.pojo.po.Gare;
 import com.pile.backend.pojo.po.mapper.GareMapper;
-import com.pile.backend.pojo.vo.GareListVo;
+import com.pile.backend.pojo.vo.GareListVO;
 import com.pile.backend.pojo.vo.JourneyListVO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -125,12 +125,12 @@ public class JourneyService {
     }
 
     // 查询城市的火车站信息
-    public GareListVo getGareInfo(GareRequestDTO gareRequestDTO) {
+    public GareListVO getGareInfo(GareRequestDTO gareRequestDTO) {
         QueryWrapper<Gare> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("commune", gareRequestDTO.getCity().toUpperCase());
         queryWrapper.select("DISTINCT libelle");
         List<Gare> gareList = gareMapper.selectList(queryWrapper);
-        GareListVo gareListVo = new GareListVo();
+        GareListVO gareListVo = new GareListVO();
         List<String> namesOfGare = new ArrayList<>();
         for(Gare gare: gareList){
             namesOfGare.add(gare.getLibelle());
