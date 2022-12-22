@@ -42,15 +42,20 @@ public class VoitureService {
 
         // 查询汽车牌子所需要的CO2(g/km)
         double co2Emission = getCo2EmissionOfCar(marque, modele);
+        logger.info("co2Emission: " + co2Emission );
 
         // 获得距离
-        DistanceOfCarBO distanceOfCarBO = getDistanceOfCarBO(requestUrl);
+        //DistanceOfCarBO distanceOfCarBO = getDistanceOfCarBO(requestUrl);
 
         VoitureCo2AndDistVO voitureCo2AndDistVO = new VoitureCo2AndDistVO();
-        voitureCo2AndDistVO.setSource(distanceOfCarBO.getSource());
-        voitureCo2AndDistVO.setDestination(distanceOfCarBO.getDestination());
-        voitureCo2AndDistVO.setCo2Emission(co2Emission * distanceOfCarBO.getDistance());
-        voitureCo2AndDistVO.setDistance(distanceOfCarBO.getDistance());
+        //voitureCo2AndDistVO.setSource(distanceOfCarBO.getSource());
+        voitureCo2AndDistVO.setSource("insa lyon");
+        //voitureCo2AndDistVO.setDestination(distanceOfCarBO.getDestination());
+        voitureCo2AndDistVO.setDestination("part dieu");
+        //voitureCo2AndDistVO.setCo2Emission(co2Emission * distanceOfCarBO.getDistance());
+        voitureCo2AndDistVO.setCo2Emission(co2Emission * 4.6);
+        //voitureCo2AndDistVO.setDistance(distanceOfCarBO.getDistance());
+        voitureCo2AndDistVO.setDistance(4.6);
         return voitureCo2AndDistVO;
     }
 

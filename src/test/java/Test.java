@@ -62,14 +62,7 @@ public class Test {
 
     @org.junit.Test
     public void testCo2Request(){
-        String url = "https://api.distancematrix.ai/maps/api/distancematrix/json?origins=20 avenue albert einstein &destinations=part dieu&key=jiYcrAIIvKENNhfDJLx8FAfyTWwX8";
-        JSONObject distanceInfo = restfulRequestUtil.doGet(url);
-        JSONObject rows = (JSONObject) distanceInfo.getJSONArray("rows").get(0);
-        System.out.println(rows);
-        JSONObject elements = (JSONObject) rows.getJSONArray("elements").get(0);
-        System.out.println(elements);
-        Long distance = elements.getJSONObject("distance").getLong("value");
-        System.out.println(distance);
+
 
     }
 
