@@ -1,9 +1,8 @@
 package com.pile.backend.controller;
 import com.pile.backend.common.result.Result;
-import com.pile.backend.pojo.bo.JourneyBO;
 import com.pile.backend.pojo.dto.GareRequestDTO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
-import com.pile.backend.pojo.vo.GareListVo;
+import com.pile.backend.pojo.vo.GareListVO;
 import com.pile.backend.pojo.vo.JourneyListVO;
 import com.pile.backend.service.JourneyService;
 import io.swagger.annotations.Api;
@@ -12,8 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Api(value = "数据字典接口")
 @RestController
@@ -42,7 +39,7 @@ public class JourneyController {
     public Result getCityGare(@RequestBody GareRequestDTO gareRequestDTO){
         try{
             logger.info("Request the JourneyInfo : " + gareRequestDTO.toString());
-            GareListVo gareListVO = journeyService.getGareInfo(gareRequestDTO);
+            GareListVO gareListVO = journeyService.getGareInfo(gareRequestDTO);
             return Result.ok(gareListVO);
         }catch (Exception e){
             logger.error(e.getMessage());
