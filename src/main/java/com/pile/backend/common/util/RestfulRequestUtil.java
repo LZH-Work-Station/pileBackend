@@ -1,5 +1,6 @@
 package com.pile.backend.common.util;
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +30,13 @@ public class RestfulRequestUtil {
     public JSONObject doGet(String url){
         ResponseEntity<String> result = restTemplate.getForEntity(url, String.class);
         return JSONUtil.parseObj(result.getBody());
+    }
+
+    public JSONArray doFlixbusSearchGet(String url){
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-RapidAPI-Key", "b5df5f932dmsh10cb0428898a9f1p1e525fjsn3d392b6cbf08");
+        headers.add("X-RapidAPI-Host", "flixbus.p.rapidapi.com");
+        ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), String.class);
+        return JSONUtil.parseArray(result.getBody());
     }
 }

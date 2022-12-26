@@ -4,8 +4,10 @@ import cn.hutool.json.JSONUtil;
 import com.pile.backend.PileApplication;
 import com.pile.backend.common.util.RestfulRequestUtil;
 import com.pile.backend.pojo.po.CarCo2;
+import com.pile.backend.pojo.po.FlixbusStation;
 import com.pile.backend.pojo.po.Gare;
 import com.pile.backend.pojo.po.mapper.CarCo2Mapper;
+import com.pile.backend.pojo.po.mapper.FlixbusStationMapper;
 import com.pile.backend.pojo.po.mapper.GareMapper;
 import lombok.Data;
 import org.junit.runner.RunWith;
@@ -22,6 +24,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +47,9 @@ public class Test {
     @Autowired
     RestfulRequestUtil restfulRequestUtil;
 
+    @Autowired
+    private FlixbusStationMapper flixbusStationMapper;
+
 
     @org.junit.Test
     public void test1() throws ClassNotFoundException {
@@ -62,8 +69,8 @@ public class Test {
 
     @org.junit.Test
     public void testCo2Request(){
-
-
+        JSONArray res = restfulRequestUtil.doFlixbusSearchGet("https://flixbus.p.rapidapi.com/v1/search-trips?to_id=1374&from_id=88&currency=EUR&departure_date=2022-12-26&number_adult=1&search_by=cities");
+        System.out.println(res.toString());
     }
 
 
@@ -151,7 +158,38 @@ public class Test {
         }
     }
 
+    @org.junit.Test
+    public void insetFlixbusStation() throws IOException {
+        File file = new File("src/main/resources/donneeInDatabase/flixbus_station.json");
+        String jsonString = new String(Files.readAllBytes(Paths.get(file.getPath())));
+        JSONArray jsonArray = JSONUtil.parseArray(jsonString);
+        for(int i=0;i<jsonArray.size();i++){
+            JSONObject flixbusInfo = jsonArray.getJSONObject(i);
+            FlixbusStation flixbusStation = new FlixbusStation();
+            flixbusStation.setStationId(flixbusInfo.getStr("id"));
+            flixbusStation.setName(flixbusInfo.getStr("name"));
+            flixbusStation.setAddress(flixbusInfo.getStr("full_address"));
+            flixbusStation.setLatitude(flixbusInfo.getJSONObject("coordinates").getDouble("latitude"));
+            flixbusStation.setLongitude(flixbusInfo.getJSONObject("coordinates").getDouble("longitude"));
+            flixbusStation.setCityId(flixbusInfo.getStr("city_id"));
+            flixbusStation.setCityName(flixbusInfo.getStr("city_name").toLowerCase());
+            System.out.println(i + "========>" + jsonArray.size());
+            try{
+                flixbusStationMapper.insert(flixbusStation);
+            }catch (Exception e){
+                System.out.println(flixbusInfo);
+            }
+        }
+    }
+}
 
+@Data
+class InsertFlixbusInfo implements Runnable{
+
+    @Override
+    public void run() {
+        System.out.println(123);
+    }
 }
 
 @Data
