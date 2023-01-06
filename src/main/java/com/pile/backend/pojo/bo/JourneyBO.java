@@ -22,6 +22,12 @@ public class JourneyBO {
     @ApiModelProperty(value = "Co2排放量")
     private double co2Emission;
 
+    @ApiModelProperty(value = "营业模式")
+    private String commercialMode;
+
     @ApiModelProperty(value = "路程时长(分钟)")
     private int duration;
+
+    @ApiModelProperty(value = "价格")
+    private double prix;
 }

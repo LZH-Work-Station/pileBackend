@@ -29,7 +29,7 @@ public class JourneyController {
             JourneyListVO journeyListVO = journeyService.getJourneyInfo(journeyRequestDTO);
             return Result.ok(journeyListVO);
         }catch (Exception e){
-            logger.error(e.getMessage());
+            logger.error(e);
             return Result.fail(e.getMessage());
         }
     }

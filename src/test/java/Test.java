@@ -6,9 +6,11 @@ import com.pile.backend.common.util.RestfulRequestUtil;
 import com.pile.backend.pojo.po.CarCo2;
 import com.pile.backend.pojo.po.FlixbusStation;
 import com.pile.backend.pojo.po.Gare;
+import com.pile.backend.pojo.po.TarifSNCF;
 import com.pile.backend.pojo.po.mapper.CarCo2Mapper;
 import com.pile.backend.pojo.po.mapper.FlixbusStationMapper;
 import com.pile.backend.pojo.po.mapper.GareMapper;
+import com.pile.backend.pojo.po.mapper.TarifSNCFMapper;
 import lombok.Data;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +46,9 @@ public class Test {
 
     @Autowired
     private CarCo2Mapper carCo2Mapper;
+
+    @Autowired
+    private TarifSNCFMapper tarifSNCFMapper;
 
     @Autowired
     RestfulRequestUtil restfulRequestUtil;
@@ -159,6 +165,114 @@ public class Test {
     }
 
     @org.junit.Test
+    public void insertTarifSNCF() throws IOException {
+        File file = new File("src/main/resources/donneeInDatabase/tarifs-intercites.csv");
+        BufferedReader reader = null;
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            // 一次读入一行，直到读入null为文件结束
+            reader.readLine();
+            while ((tempString = reader.readLine()) !=  null) {
+                InsertTarifSNCFIntercites insertTarifSNCFIntercites = new InsertTarifSNCFIntercites();
+                insertTarifSNCFIntercites.setTarifSNCFMapper(tarifSNCFMapper);
+                insertTarifSNCFIntercites.setTempString(tempString);
+                pool.execute(insertTarifSNCFIntercites);
+            }
+            pool.shutdown();
+
+            try {//等待直到所有任务完成
+                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+
+                e.printStackTrace();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+    }
+
+    @org.junit.Test
+    public void insertTarifSNCFTer() throws IOException {
+        File file = new File("src/main/resources/donneeInDatabase/tarifs-ter-par-od.csv");
+        BufferedReader reader = null;
+        ExecutorService pool = Executors.newFixedThreadPool(8);
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            // 一次读入一行，直到读入null为文件结束
+            reader.readLine();
+            while ((tempString = reader.readLine()) != null) {
+                InsertTarifSNCFTer insertTarifSNCFTer = new InsertTarifSNCFTer();
+                insertTarifSNCFTer.setTarifSNCFMapper(tarifSNCFMapper);
+                insertTarifSNCFTer.setTempString(tempString);
+                pool.execute(insertTarifSNCFTer);
+            }
+            pool.shutdown();
+
+            try {//等待直到所有任务完成
+                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+    }
+    @org.junit.Test
+    public void insertTarifSNCFINOUI() throws IOException{
+        File file = new File("src/main/resources/donneeInDatabase/tarifs-tgv-inoui-ouigo.csv");
+        BufferedReader reader = null;
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String tempString = null;
+            // 一次读入一行，直到读入null为文件结束
+            reader.readLine();
+            while ((tempString = reader.readLine()) !=  null) {
+                InsertTarifSNCFINOUI insertTarifSNCFINOUI = new InsertTarifSNCFINOUI();
+                insertTarifSNCFINOUI.setTarifSNCFMapper(tarifSNCFMapper);
+                insertTarifSNCFINOUI.setTempString(tempString);
+                pool.execute(insertTarifSNCFINOUI);
+            }
+            pool.shutdown();
+
+            try {//等待直到所有任务完成
+                pool.awaitTermination(Long.MAX_VALUE, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
+    }
+
+    @org.junit.Test
     public void insetFlixbusStation() throws IOException {
         File file = new File("src/main/resources/donneeInDatabase/flixbus_station.json");
         String jsonString = new String(Files.readAllBytes(Paths.get(file.getPath())));
@@ -184,11 +298,80 @@ public class Test {
 }
 
 @Data
-class InsertFlixbusInfo implements Runnable{
+class InsertTarifSNCFINOUI implements Runnable{
+    private String tempString;
+    private TarifSNCFMapper tarifSNCFMapper;
 
     @Override
     public void run() {
-        System.out.println(123);
+        TarifSNCF tarifSNCF = new TarifSNCF();
+        String[] strs = tempString.split(";");
+        tarifSNCF.setTransporteur(strs[0].toLowerCase());
+        tarifSNCF.setOrigine(strs[1]);
+        tarifSNCF.setOrigineCodeUIC(strs[2]);
+        tarifSNCF.setDestination(strs[3]);
+        tarifSNCF.setDestinationCodeUIC(strs[4]);
+        tarifSNCF.setClasse(Integer.parseInt(strs[5]));
+        tarifSNCF.setPrix((Double.parseDouble(strs[7])+Double.parseDouble(strs[8]))/2);
+        tarifSNCFMapper.insert(tarifSNCF);
+        System.out.println(tarifSNCF);
+    }
+
+    private boolean testEmpty(String s){
+        return "".equals(s);
+    }
+}
+
+@Data
+class InsertTarifSNCFTer implements Runnable{
+    private String tempString;
+    private TarifSNCFMapper tarifSNCFMapper;
+
+    @Override
+    public void run() {
+        TarifSNCF tarifSNCF = new TarifSNCF();
+        String[] strs = tempString.split(";");
+        if(strs[6].equals("Tarif normal")) {
+            tarifSNCF.setTransporteur("ter");
+            tarifSNCF.setOrigine(strs[1]);
+            tarifSNCF.setOrigineCodeUIC(strs[2]);
+            tarifSNCF.setDestination(strs[3]);
+            tarifSNCF.setDestinationCodeUIC(strs[4]);
+            tarifSNCF.setClasse(2);
+            tarifSNCF.setPrix(Double.parseDouble(strs[7]));
+            tarifSNCFMapper.insert(tarifSNCF);
+            System.out.println(tarifSNCF);
+        }
+    }
+
+    private boolean testEmpty(String s){
+        return "".equals(s);
+    }
+}
+
+
+@Data
+class InsertTarifSNCFIntercites implements Runnable{
+    private String tempString;
+    private TarifSNCFMapper tarifSNCFMapper;
+
+    @Override
+    public void run() {
+        TarifSNCF tarifSNCF = new TarifSNCF();
+        String[] strs = tempString.split(";");
+        tarifSNCF.setTransporteur("intercites");
+        tarifSNCF.setOrigine(strs[1]);
+        tarifSNCF.setOrigineCodeUIC(strs[2]);
+        tarifSNCF.setDestination(strs[3]);
+        tarifSNCF.setDestinationCodeUIC(strs[4]);
+        tarifSNCF.setClasse(Integer.parseInt(strs[5]));
+        tarifSNCF.setPrix((Double.parseDouble(strs[7])+Double.parseDouble(strs[8]))/2);
+        tarifSNCFMapper.insert(tarifSNCF);
+        System.out.println(tarifSNCF);
+    }
+
+    private boolean testEmpty(String s){
+        return "".equals(s);
     }
 }
 

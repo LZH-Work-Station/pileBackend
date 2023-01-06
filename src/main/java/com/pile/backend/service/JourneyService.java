@@ -1,5 +1,6 @@
 package com.pile.backend.service;
 
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.pile.backend.common.util.DateTimeUtil;
@@ -8,7 +9,9 @@ import com.pile.backend.pojo.bo.JourneyBO;
 import com.pile.backend.pojo.dto.GareRequestDTO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
 import com.pile.backend.pojo.po.Gare;
+import com.pile.backend.pojo.po.TarifSNCF;
 import com.pile.backend.pojo.po.mapper.GareMapper;
+import com.pile.backend.pojo.po.mapper.TarifSNCFMapper;
 import com.pile.backend.pojo.vo.GareListVO;
 import com.pile.backend.pojo.vo.JourneyListVO;
 import org.apache.logging.log4j.LogManager;
@@ -33,6 +36,9 @@ public class JourneyService {
 
     @Autowired
     private GareMapper gareMapper;
+
+    @Autowired
+    private TarifSNCFMapper tarifSNCFMapper;
 
     public JourneyListVO getJourneyInfo(JourneyRequestDTO journeyRequestDTO) {
         // source: 75056, destination: 69123
@@ -110,14 +116,28 @@ public class JourneyService {
             journeyBO.setDestination(journeyRequestDTO.getDestination());
             journeyBO.setArrivalTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("arrival_date_time")));
             journeyBO.setDepartureTime(dateTimeUtil.changeFormatOfDate(journeysInJson.getStr("departure_date_time")));
+
+            JSONArray sectionsInfo = journeysInJson.getJSONArray("sections");
+            JSONObject mode = new JSONObject();
+            // 为了获取运行的公司是TER还是啥的
+            for(int i=0;i<sectionsInfo.size();i++){
+                if(sectionsInfo.getJSONObject(i).containsKey("display_informations")){
+                    mode = sectionsInfo.getJSONObject(i);
+                }
+            }
+            String transporteur = mode.getJSONObject("display_informations").getStr("commercial_mode");
+            String[] codes = getCodeUIC(url);
+            double prix = getPrix(codes, transporteur.toLowerCase());
+            journeyBO.setCommercialMode(transporteur);
             journeyBO.setCo2Emission(journeysInJson.getJSONObject("co2_emission").getDouble("value"));
             journeyBO.setDuration(journeysInJson.getInt("duration") / 60);
+            journeyBO.setPrix(prix);
             list.add(journeyBO);
         }
 
         // 获得下一个请求的url
         String nextUrl = journeysInfo.getJSONArray("links").getJSONObject(0).getStr("href").replaceAll("%3A", ":");
-
+        logger.info(nextUrl);
         // 如果日期不一致了就代表出发时间改变了
         if(date.equals(nextUrl.substring(nextUrl.length()-15, nextUrl.length()-7))){
             requestJourney(nextUrl, date, journeyRequestDTO, list);
@@ -137,6 +157,32 @@ public class JourneyService {
         }
         gareListVo.setGareList(namesOfGare);
         return gareListVo;
+    }
+
+    public String[] getCodeUIC(String url){
+        String[] strs = url.split(":SNCF:");
+        String[] codes = new String[2];
+        for(int i=1;i<3;i++){
+            codes[i-1] = strs[i].split("&")[0];
+        }
+        return codes;
+    }
+
+    public double getPrix(String[] codes, String transporteur){
+        QueryWrapper<TarifSNCF> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("origine_code_uic", codes[0]);
+        queryWrapper.eq("destination_code_uic", codes[1]);
+        queryWrapper.eq("classe", 2);
+        logger.info(transporteur + ", " + codes[0] + ", " + codes[1]);
+        if(transporteur.equals("intercités")){
+            transporteur = "intercites";
+        }
+        queryWrapper.eq("transporteur", transporteur);
+        List<TarifSNCF> tarifSNCFS = tarifSNCFMapper.selectList(queryWrapper);
+        if(tarifSNCFS.size()==0){
+            return -1;
+        }
+        return tarifSNCFS.get(0).getPrix();
     }
 
 }

@@ -85,6 +85,21 @@ CREATE TABLE gare
 );
 
 USE greenmind;
+DROP TABLE IF EXISTS tarif_sncf;
+CREATE TABLE tarif_sncf
+(
+    id INT(11) NOT NULL AUTO_INCREMENT COMMENT '',
+    transporteur VARCHAR(50) NULL COMMENT '',
+    origine VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+    origine_code_uic VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+    destination VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+    destination_code_uic VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+    classe INT(11) NULL DEFAULT NULL COMMENT '',
+    prix DECIMAL(50,15) NULL DEFAULT NULL COMMENT '',
+    PRIMARY KEY (id)
+);
+
+USE greenmind;
 DROP TABLE IF EXISTS flixbus_station;
 CREATE TABLE flixbus_station
 (
