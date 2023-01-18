@@ -61,4 +61,12 @@ public class BlogService {
         List<Blog> blogs = blogMapper.selectList(queryWrapper);
         return blogs;
     }
+
+    public List<Blog> getCityLatestBlog(String city){
+        QueryWrapper<Blog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("date");
+        queryWrapper.eq("city", city);
+        queryWrapper.last("limit 6");
+        return blogMapper.selectList(queryWrapper);
+    }
 }

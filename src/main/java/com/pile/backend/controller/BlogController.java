@@ -48,4 +48,15 @@ public class BlogController {
         }
     }
 
+    @PostMapping("getCityLatestBlog")
+    @ApiOperation(value = "获得某个城市最新的blog")
+    public Result getCityLatestBlog(@RequestBody String city){
+        try{
+            return Result.ok(blogService.getCityLatestBlog(city));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+            return Result.fail(e.getMessage());
+        }
+    }
+
 }

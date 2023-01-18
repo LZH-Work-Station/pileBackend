@@ -92,7 +92,7 @@ public class FlixbusService {
             Long durationInSecond = arrivalTimestamp - departureTimestamp;
             double heure = (double)durationInSecond / 3600.0;
             double distance = heure * 65;
-            double co2Emission = 0.11*1000*distance/50;
+            double co2Emission = (double)Math.round(0.11*1000*distance/50*100)/100;
 
             Integer hour = timetable.getJSONObject("duration").getInt("hour");
             Integer minutes = timetable.getJSONObject("duration").getInt("minutes");
