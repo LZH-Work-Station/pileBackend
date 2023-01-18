@@ -29,6 +29,9 @@ public class Blog {
     @TableField(value = "city")
     private String city;
 
+    @TableField(value = "image")
+    private String image;
+
     @TableField(value = "date")
     private Date date;
 }

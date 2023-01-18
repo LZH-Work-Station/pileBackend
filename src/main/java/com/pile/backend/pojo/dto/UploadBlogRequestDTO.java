@@ -16,4 +16,7 @@ public class UploadBlogRequestDTO {
 
     @ApiModelProperty(value = "city")
     private String city;
+
+    @ApiModelProperty(value = "image")
+    private String image;
 }

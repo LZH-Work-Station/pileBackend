@@ -47,6 +47,7 @@ public class BlogService {
         blog.setTitle(uploadBlogRequestDTO.getTitle());
         blog.setId(uuid);
         blog.setDate(new Date());
+        blog.setImage(uploadBlogRequestDTO.getImage());
         blog.setUsername(uploadBlogRequestDTO.getUsername());
         blogMapper.insert(blog);
         logger.info("Upload the new blog", blog);
