@@ -88,12 +88,18 @@ public class FlixbusService {
             Long arrivalTimestamp = timetable.getJSONObject("arrival").getLong("timestamp");
             String arrivalTime = DateUtil.date(arrivalTimestamp*1000).toString();
 
+            // 估计co2
+            Long durationInSecond = arrivalTimestamp - departureTimestamp;
+            double heure = (double)durationInSecond / 3600.0;
+            double distance = heure * 65;
+            double co2Emission = 0.11*1000*distance/50;
+
             Integer hour = timetable.getJSONObject("duration").getInt("hour");
             Integer minutes = timetable.getJSONObject("duration").getInt("minutes");
             String duration = hour + "h" + minutes;
 
             FlixbusTripBO flixbusTripBO = new FlixbusTripBO();
-
+            flixbusTripBO.setCo2Emission(co2Emission);
             flixbusTripBO.setDepatureTime(departureTime);
             flixbusTripBO.setArrivalTime(arrivalTime);
             flixbusTripBO.setDuration(duration);
