@@ -3,6 +3,9 @@ package com.pile.backend.common.util;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.pile.backend.controller.JourneyController;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 public class RestfulRequestUtil {
+    private static final Logger logger = LogManager.getLogger(RestfulRequestUtil.class);
 
     @Autowired
     RestTemplate restTemplate;
@@ -22,7 +26,13 @@ public class RestfulRequestUtil {
         // 获取请求的url
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", token);
-        ResponseEntity<String> result = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), String.class);
+        ResponseEntity<String> result;
+        try {
+            result = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<String>(headers), String.class);
+        }catch (Exception e){
+            logger.warn("Http request error " + e.getMessage());
+            return null;
+        }
         return JSONUtil.parseObj(result.getBody());
     }
 

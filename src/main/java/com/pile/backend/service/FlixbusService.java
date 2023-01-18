@@ -26,7 +26,7 @@ import java.util.SimpleTimeZone;
 public class FlixbusService {
     private static final Logger logger = LogManager.getLogger(FlixbusService.class);
     private static final String url = "https://flixbus.p.rapidapi.com/v1/search-trips?to_id={destination}&from_id={source}&currency=EUR&departure_date={date}&number_adult=1&search_by=stations";
-    private static final String token = "b5df5f932dmsh10cb0428898a9f1p1e525fjsn3d392b6cbf08";
+    private static final String token = "25d27827demsh606a5a6643ae4f9p1c537ajsnf88fda967d9a";
 
     @Autowired
     private RestfulRequestUtil restfulRequestUtil;

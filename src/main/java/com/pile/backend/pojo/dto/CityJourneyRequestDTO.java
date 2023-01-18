@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class JourneyRequestDTO {
+@Builder
+public class CityJourneyRequestDTO {
     @ApiModelProperty(value = "出发日期")
     private String date;
 
     @ApiModelProperty(value = "小时")
+    @Builder.Default
     private int hour = -1;
 
     @ApiModelProperty(value = "起点")
-    private String source;
+    private String sourceCity;
 
     @ApiModelProperty(value = "终点")
-    private String destination;
+    private String destinationCity;
 }

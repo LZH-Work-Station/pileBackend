@@ -28,7 +28,7 @@ public class VoitureService {
 
     private static final Logger logger = LogManager.getLogger(VoitureService.class);
     private static final String url = "https://api.distancematrix.ai/maps/api/distancematrix/json?origins={source}&destinations={destination}&key={token}";
-    private static final String token = "jiYcrAIIvKENNhfDJLx8FAfyTWwX8";
+    private static final String token = "dI0xKR9c6rqYiGJYNUgdomxU0TFe6";
 
     @Autowired
     private CarCo2Mapper carCo2Mapper;
@@ -50,17 +50,17 @@ public class VoitureService {
         logger.info("co2Emission: " + co2Emission );
 
         // 获得距离
-        //DistanceOfCarBO distanceOfCarBO = getDistanceOfCarBO(requestUrl);
+        DistanceOfCarBO distanceOfCarBO = getDistanceOfCarBO(requestUrl);
 
         VoitureCo2AndDistVO voitureCo2AndDistVO = new VoitureCo2AndDistVO();
-        //voitureCo2AndDistVO.setSource(distanceOfCarBO.getSource());
-        voitureCo2AndDistVO.setSource("insa lyon");
-        //voitureCo2AndDistVO.setDestination(distanceOfCarBO.getDestination());
-        voitureCo2AndDistVO.setDestination("part dieu");
-        //voitureCo2AndDistVO.setCo2Emission(co2Emission * distanceOfCarBO.getDistance());
-        voitureCo2AndDistVO.setCo2Emission(co2Emission * 4.6);
-        //voitureCo2AndDistVO.setDistance(distanceOfCarBO.getDistance());
-        voitureCo2AndDistVO.setDistance(4.6);
+        voitureCo2AndDistVO.setSource(distanceOfCarBO.getSource());
+        //voitureCo2AndDistVO.setSource("insa lyon");
+        voitureCo2AndDistVO.setDestination(distanceOfCarBO.getDestination());
+        //voitureCo2AndDistVO.setDestination("part dieu");
+        voitureCo2AndDistVO.setCo2Emission(co2Emission * distanceOfCarBO.getDistance());
+        //voitureCo2AndDistVO.setCo2Emission(co2Emission * 4.6);
+        voitureCo2AndDistVO.setDistance(distanceOfCarBO.getDistance());
+        //voitureCo2AndDistVO.setDistance(4.6);
         return voitureCo2AndDistVO;
     }
 

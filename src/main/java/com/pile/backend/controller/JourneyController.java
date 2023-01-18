@@ -1,7 +1,9 @@
 package com.pile.backend.controller;
 import com.pile.backend.common.result.Result;
+import com.pile.backend.pojo.dto.CityJourneyRequestDTO;
 import com.pile.backend.pojo.dto.GareRequestDTO;
 import com.pile.backend.pojo.dto.JourneyRequestDTO;
+import com.pile.backend.pojo.vo.CityJourneyListVO;
 import com.pile.backend.pojo.vo.GareListVO;
 import com.pile.backend.pojo.vo.JourneyListVO;
 import com.pile.backend.service.JourneyService;
@@ -43,6 +45,19 @@ public class JourneyController {
             return Result.ok(gareListVO);
         }catch (Exception e){
             logger.error(e.getMessage());
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    @PostMapping("getJourneyInfoOfCity")
+    @ApiOperation(value = "获得城市的票的信息")
+    public Result getJourneyInfo(@RequestBody CityJourneyRequestDTO cityJourneyRequestDTO) {
+        try {
+            logger.info("Request the JourneyInfo : " + cityJourneyRequestDTO.toString());
+            CityJourneyListVO cityJourneyListVO = journeyService.getCityJourneyListInfo(cityJourneyRequestDTO);
+            return Result.ok(cityJourneyListVO);
+        } catch (Exception e) {
+            logger.error(e);
             return Result.fail(e.getMessage());
         }
     }
