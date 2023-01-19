@@ -1,6 +1,7 @@
 package com.pile.backend.controller;
 
 import com.pile.backend.common.result.Result;
+import com.pile.backend.pojo.dto.CityBlogDTO;
 import com.pile.backend.pojo.dto.CityStationsRequestDTO;
 import com.pile.backend.pojo.dto.FlixbusTripsRequestDTO;
 import com.pile.backend.pojo.dto.UploadBlogRequestDTO;
@@ -50,9 +51,9 @@ public class BlogController {
 
     @PostMapping("getCityLatestBlog")
     @ApiOperation(value = "获得某个城市最新的blog")
-    public Result getCityLatestBlog(@RequestBody String city){
+    public Result getCityLatestBlog(@RequestBody CityBlogDTO cityBlogDTO){
         try{
-            return Result.ok(blogService.getCityLatestBlog(city));
+            return Result.ok(blogService.getCityLatestBlog(cityBlogDTO.getCity()));
         }catch (Exception e){
             logger.error(e.getMessage());
             return Result.fail(e.getMessage());
